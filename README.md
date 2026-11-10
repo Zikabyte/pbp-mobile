@@ -10,7 +10,7 @@ Aplikasi portfolio berbasis Flutter untuk mata kuliah Pemrograman Berbasis Platf
 
 </div>
 
-## Memulai
+## Setup
 
 ### Prasyarat
 
