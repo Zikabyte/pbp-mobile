@@ -14,7 +14,7 @@ Aplikasi portfolio berbasis Flutter untuk mata kuliah Pemrograman Berbasis Platf
 
 ### Prasyarat
 
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (CI menggunakan versi `3.44.2`, lihat [.github/workflows/analyze.yml](.github/workflows/analyze.yml))
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (CI menggunakan versi `3.47.9`, lihat [.github/workflows/analyze.yml](.github/workflows/analyze.yml))
 - Device, emulator, atau simulator yang sudah terhubung
 
 ### Installation
