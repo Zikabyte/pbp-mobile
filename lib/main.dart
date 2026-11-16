@@ -1,25 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:portfolio_mobile/features/home/pages/home_page.dart';
+import 'package:portfolio_mobile/app.dart';
 
 void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: .fromSeed(
-          seedColor: Colors.indigo,
-          secondary: Colors.amber,
-        ),
-        useMaterial3: true,
-      ),
-      home: MyHomePage(),
-    );
-  }
+  runApp(const App());
 }

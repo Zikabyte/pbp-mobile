@@ -1,27 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio_mobile/core/themes/font_theme.dart';
 
 class InfoCard extends StatelessWidget {
-  // Kartu informasi yang menampilkan judul (title) dan isi (content).
   final String title;
   final String content;
+  final IconData icon;
 
-  const InfoCard({super.key, required this.title, required this.content});
+  const InfoCard({
+    super.key,
+    required this.title,
+    required this.content,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      // Memberikan efek bayangan kartu elevasi 2 unit.
-      elevation: 2.0,
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Expanded(
       child: Container(
-        // Menyesuaikan lebar kartu dengan proporsi layar (dibagi 3.5).
-        width: MediaQuery.of(context).size.width / 3.5,
-        padding: const EdgeInsets.all(16.0),
-        // Menyusun teks title dan content secara vertikal.
+        margin: const EdgeInsets.symmetric(horizontal: 4.0),
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+        decoration: BoxDecoration(
+          color: colorScheme.primary.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(24.0),
+          border: Border.all(
+            color: colorScheme.primary.withValues(alpha: 0.12),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.primary.withValues(alpha: 0.08),
+              blurRadius: 20.0,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8.0),
-            Text(content),
+            CircleAvatar(
+              radius: 20.0,
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.15),
+              child: Icon(icon, size: 20.0, color: colorScheme.primary),
+            ),
+            const SizedBox(height: 12.0),
+            Text(
+              title.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: FontTheme.labelSmall.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                letterSpacing: 0.6,
+              ),
+            ),
+            const SizedBox(height: 4.0),
+            Text(
+              content,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: FontTheme.titleMedium.copyWith(
+                color: colorScheme.onSurface,
+                fontSize: 11,
+              ),
+            ),
           ],
         ),
       ),
