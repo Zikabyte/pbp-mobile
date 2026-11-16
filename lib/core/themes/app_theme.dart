@@ -27,4 +27,29 @@ abstract final class AppTheme {
       ),
     );
   }
+
+  static ThemeData get dark {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: BaseColors.darkBackground,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: BaseColors.primary,
+        brightness: Brightness.dark,
+        primary: BaseColors.primary300,
+        secondary: BaseColors.secondary300,
+        error: BaseColors.error,
+        surface: BaseColors.darkSurface,
+      ),
+      textTheme: FontTheme.textTheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: BaseColors.darkSurface,
+        foregroundColor: BaseColors.darkTextPrimary,
+        elevation: 0,
+        titleTextStyle: FontTheme.titleLarge.copyWith(
+          color: BaseColors.darkTextPrimary,
+        ),
+      ),
+    );
+  }
 }

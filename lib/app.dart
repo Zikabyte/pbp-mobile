@@ -10,6 +10,8 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Zikafolio',
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       home: MyHomePage(),
       debugShowCheckedModeBanner: false,
     );
