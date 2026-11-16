@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio_mobile/core/themes/base_colors.dart';
+import 'package:portfolio_mobile/core/themes/font_theme.dart';
 import 'package:portfolio_mobile/features/home/widgets/info_card.dart';
 
 class MyHomePage extends StatelessWidget {
@@ -9,73 +11,135 @@ class MyHomePage extends StatelessWidget {
   final String kelas = "PBP F";
 
   final List<ItemHomepage> items = [
-    ItemHomepage("Lihat Proyek", Icons.folder),
-    ItemHomepage("Tambah Proyek", Icons.add_circle),
-    ItemHomepage("Logout", Icons.logout),
+    ItemHomepage('Lihat Proyek', Icons.folder_rounded, BaseColors.primary500),
+    ItemHomepage(
+      'Tambah Proyek',
+      Icons.add_circle_rounded,
+      BaseColors.secondary500,
+    ),
+    ItemHomepage('Logout', Icons.logout_rounded, BaseColors.error),
   ];
 
   @override
   Widget build(BuildContext context) {
-    // Scaffold menyediakan struktur visual dasar halaman (AppBar, Body, SnackBar).
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      // AppBar menampilkan bar bagian atas halaman aplikasi.
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'MyPortfolio',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: FontTheme.titleLarge.copyWith(color: Colors.white),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: colorScheme.primary,
       ),
-      // Body halaman utama dengan padding di sekelilingnya.
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Baris horizontal untuk menampilkan 3 InfoCard secara sejajar.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InfoCard(title: 'NPM', content: npm),
-                InfoCard(title: 'Name', content: nama),
-                InfoCard(title: 'Class', content: kelas),
-              ],
-            ),
-
-            const SizedBox(height: 16.0),
-
-            // Bagian tengah: pesan sambutan dan kisi tombol menu portofolio.
-            Center(
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 16.0),
-                    child: Text(
-                      'Selamat datang di MyPortfolio Mobile!',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.0,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: colorScheme.primary,
+                          width: 3.0,
+                        ),
+                      ),
+                      child: const CircleAvatar(
+                        radius: 48.0,
+                        backgroundImage: AssetImage(
+                          'assets/images/self-portrait.jpg',
+                        ),
                       ),
                     ),
-                  ),
-
-                  // GridView menampilkan kartu tombol dalam tata letak kisi 3 kolom.
-                  GridView.count(
-                    primary: true,
-                    padding: const EdgeInsets.all(20),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 3,
-                    // shrinkWrap agar ukuran kisi menyesuaikan tinggi konten anak.
-                    shrinkWrap: true,
-                    children: items.map((ItemHomepage item) {
-                      return ItemCard(item);
-                    }).toList(),
-                  ),
-                ],
+                    const SizedBox(height: 12.0),
+                    Text(
+                      nama,
+                      textAlign: TextAlign.center,
+                      style: FontTheme.headlineMedium.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2.0),
+                    Text(
+                      kelas,
+                      textAlign: TextAlign.center,
+                      style: FontTheme.bodyMedium.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 24.0),
+
+              IntrinsicHeight(
+                child: Row(
+                  children: [
+                    InfoCard(
+                      title: 'NPM',
+                      content: npm,
+                      icon: Icons.badge_rounded,
+                    ),
+                    InfoCard(
+                      title: 'Name',
+                      content: nama,
+                      icon: Icons.person_rounded,
+                    ),
+                    InfoCard(
+                      title: 'Class',
+                      content: kelas,
+                      icon: Icons.school_rounded,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 28.0),
+
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'Selamat datang di MyPortfolio Mobile!',
+                      textAlign: TextAlign.center,
+                      style: FontTheme.headlineMedium.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      'Pilih salah satu menu di bawah ini',
+                      textAlign: TextAlign.center,
+                      style: FontTheme.bodyMedium.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20.0),
+
+              GridView.count(
+                padding: EdgeInsets.zero,
+                crossAxisSpacing: 12.0,
+                mainAxisSpacing: 12.0,
+                crossAxisCount: 3,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: items.map((ItemHomepage item) {
+                  return ItemCard(item);
+                }).toList(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -85,8 +149,9 @@ class MyHomePage extends StatelessWidget {
 class ItemHomepage {
   final String name;
   final IconData icon;
+  final Color color;
 
-  ItemHomepage(this.name, this.icon);
+  const ItemHomepage(this.name, this.icon, this.color);
 }
 
 class ItemCard extends StatelessWidget {
@@ -97,36 +162,39 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      // Menggunakan warna sekunder dari skema tema aplikasi.
-      color: Theme.of(context).colorScheme.secondary,
-      borderRadius: BorderRadius.circular(12),
+      color: item.color,
+      elevation: 6.0,
+      shadowColor: item.color.withValues(alpha: 0.45),
+      borderRadius: BorderRadius.circular(18.0),
       child: InkWell(
-        // Aksi ketika kartu ditekan oleh pengguna.
+        borderRadius: BorderRadius.circular(18.0),
         onTap: () {
-          // Menampilkan SnackBar dengan pesan interaktif.
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.all(16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
                 content: Text("Kamu telah menekan tombol ${item.name}!"),
               ),
             );
         },
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(item.icon, color: Colors.white, size: 30.0),
-                const Padding(padding: EdgeInsets.all(3)),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(item.icon, color: Colors.white, size: 28.0),
+              const SizedBox(height: 8.0),
+              Text(
+                item.name,
+                textAlign: TextAlign.center,
+                style: FontTheme.labelLarge.copyWith(color: Colors.white),
+              ),
+            ],
           ),
         ),
       ),

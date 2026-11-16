@@ -37,15 +37,4 @@ abstract final class BaseColors {
   static const Color warning = Color(0xFFFD9A00);
   static const Color error = Color(0xFFF93446);
   static const Color errorLight = Color(0xFFFDE7E9);
-
-  // Dark mode counterparts.
-  static const Color darkBackground = Color(0xFF121212);
-  static const Color darkSurface = Color(0xFF1E1E1E);
-  static const Color darkBorder = Color(0xFF2E2E2E);
-
-  static const Color darkTextPrimary = Color(0xFFF5F5F5);
-  static const Color darkTextSecondary = Color(0xFFB3B3B3);
-  static const Color darkTextDisabled = Color(0xFF6B6B6B);
-
-  static const Color darkErrorLight = Color(0xFF3B1414);
 }
