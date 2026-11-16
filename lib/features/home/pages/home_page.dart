@@ -4,9 +4,9 @@ import 'package:portfolio_mobile/features/home/widgets/info_card.dart';
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
 
-  final String npm = "2406000001";
-  final String nama = "Burhan";
-  final String kelas = "PBP A";
+  final String npm = "2506584861";
+  final String nama = "Mohammad Zidane Kurnianto";
+  final String kelas = "PBP F";
 
   final List<ItemHomepage> items = [
     ItemHomepage("Lihat Proyek", Icons.folder),
