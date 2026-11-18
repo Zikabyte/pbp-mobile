@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio_mobile/core/themes/base_colors.dart';
+import 'package:portfolio_mobile/features/projects/pages/project_form.dart';
 
 import '../../features/home/pages/home_page.dart';
 
@@ -46,8 +47,12 @@ class LeftDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.add_circle_outline),
             title: const Text('Add Project'),
-            // Navigasi ke halaman tambah proyek
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProjectFormPage()),
+              );
+            },
           ),
         ],
       ),

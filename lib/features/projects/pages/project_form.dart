@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio_mobile/core/themes/base_colors.dart';
+import 'package:portfolio_mobile/core/widgets/left_drawer.dart';
 
 class ProjectFormPage extends StatefulWidget {
   const ProjectFormPage({super.key});
@@ -28,11 +30,16 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('Add Project Form')),
-        backgroundColor: Colors.indigo,
+        title: const Center(
+          child: Text(
+            'Add Project Form',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        backgroundColor: BaseColors.primary,
         foregroundColor: Colors.white,
       ),
-      // TODO: Tambahkan drawer yang sudah dibuat di sini
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -160,7 +167,9 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.indigo),
+                      backgroundColor: WidgetStateProperty.all(
+                        BaseColors.primary,
+                      ),
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
