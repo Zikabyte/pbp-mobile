@@ -47,10 +47,7 @@ class LeftDrawer extends StatelessWidget {
             leading: const Icon(Icons.add_circle_outline),
             title: const Text('Add Project'),
             // Navigasi ke halaman tambah proyek
-            onTap: () {
-              /*
-    */
-            },
+            onTap: () {},
           ),
         ],
       ),
