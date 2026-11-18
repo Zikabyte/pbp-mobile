@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:portfolio_mobile/core/themes/base_colors.dart';
 import 'package:portfolio_mobile/core/themes/font_theme.dart';
 import 'package:portfolio_mobile/features/home/widgets/info_card.dart';
+import 'package:portfolio_mobile/core/widgets/left_drawer.dart';
+import 'package:portfolio_mobile/features/projects/pages/project_form.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
@@ -26,12 +28,14 @@ class MyHomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'MyPortfolio',
-          style: FontTheme.titleLarge.copyWith(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
+      drawer: const LeftDrawer(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -181,6 +185,13 @@ class ItemCard extends StatelessWidget {
                 content: Text("Kamu telah menekan tombol ${item.name}!"),
               ),
             );
+          // Navigate ke halaman yang sesuai
+          if (item.name == "Tambah Proyek") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProjectFormPage()),
+            );
+          }
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 8.0),
