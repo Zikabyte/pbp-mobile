@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio_mobile/core/themes/base_colors.dart';
+import 'package:portfolio_mobile/features/experiences/pages/experience_form.dart';
 import 'package:portfolio_mobile/features/projects/pages/project_form.dart';
 
 import '../../features/home/pages/home_page.dart';
@@ -51,6 +52,16 @@ class LeftDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ProjectFormPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.work_outline),
+            title: const Text('Add Experience'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ExperienceFormPage()),
               );
             },
           ),
