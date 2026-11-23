@@ -21,15 +21,15 @@ class LeftDrawer extends StatelessWidget {
                 Text(
                   'My Portfolio',
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 8),
                 Text(
                   'Explore personal projects and experiences!',
-                  style: TextStyle(fontSize: 15, color: Colors.white),
+                  style: TextStyle(fontSize: 13, color: Colors.white),
                 ),
               ],
             ),

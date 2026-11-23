@@ -3,6 +3,7 @@ import 'package:portfolio_mobile/core/themes/base_colors.dart';
 import 'package:portfolio_mobile/core/themes/font_theme.dart';
 import 'package:portfolio_mobile/features/home/widgets/info_card.dart';
 import 'package:portfolio_mobile/core/widgets/left_drawer.dart';
+import 'package:portfolio_mobile/features/experiences/pages/experience_form.dart';
 import 'package:portfolio_mobile/features/projects/pages/project_form.dart';
 
 class MyHomePage extends StatelessWidget {
@@ -19,6 +20,7 @@ class MyHomePage extends StatelessWidget {
       Icons.add_circle_rounded,
       BaseColors.secondary500,
     ),
+    ItemHomepage('Tambah Pengalaman', Icons.work_rounded, BaseColors.warning),
     ItemHomepage('Logout', Icons.logout_rounded, BaseColors.error),
   ];
 
@@ -190,6 +192,11 @@ class ItemCard extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProjectFormPage()),
+            );
+          } else if (item.name == "Tambah Pengalaman") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ExperienceFormPage()),
             );
           }
         },
