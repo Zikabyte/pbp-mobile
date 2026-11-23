@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio_mobile/core/themes/base_colors.dart';
+import 'package:portfolio_mobile/features/experiences/pages/experience_form.dart';
 import 'package:portfolio_mobile/features/projects/pages/project_form.dart';
 
 import '../../features/home/pages/home_page.dart';
@@ -20,15 +21,15 @@ class LeftDrawer extends StatelessWidget {
                 Text(
                   'My Portfolio',
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 8),
                 Text(
                   'Explore personal projects and experiences!',
-                  style: TextStyle(fontSize: 15, color: Colors.white),
+                  style: TextStyle(fontSize: 13, color: Colors.white),
                 ),
               ],
             ),
@@ -51,6 +52,16 @@ class LeftDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ProjectFormPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.work_outline),
+            title: const Text('Add Experience'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ExperienceFormPage()),
               );
             },
           ),

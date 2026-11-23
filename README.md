@@ -137,3 +137,51 @@ AI digunakan hanya untuk styling dan writing widget testing. Kerangka `core/them
 - Menjalankan Claude Code dalam manual approval mode (bukan auto-accept), sehingga setiap perubahan/edit yang diajukan AI harus ditinjau dan disetujui secara eksplisit satu per satu.
 - Semua kode hasil AI ditinjau dan diuji secara manual sebelum di-commit.
 - Mengerjakan feature yang diminta tugas sendiri (tanpa bantuan AI).
+
+### Tugas 8
+
+> Formulir Project ada di [lib/features/projects/pages/project_form.dart](lib/features/projects/pages/project_form.dart), formulir Experience ada di [lib/features/experiences/pages/experience_form.dart](lib/features/experiences/pages/experience_form.dart).
+
+1. Ketiganya sama-sama mengubah stack navigasi, tetapi dengan cara yang berbeda:
+   - **`Navigator.push()`**: menaruh halaman baru di atas halaman yang sedang aktif tanpa menghapus halaman tersebut dari stack. Halaman lama tetap tersimpan sehingga pengguna bisa kembali ke sana.
+   - **`Navigator.pushReplacement()`**: menaruh halaman baru sekaligus menghapus halaman yang sedang aktif dari stack. Halaman yang digantikan tidak bisa dicapai lagi lewat tombol kembali karena sudah dibuang.
+   - **`Navigator.pop()`**: menghapus halaman paling atas dari stack dan mengembalikan tampilan ke halaman yang ada di bawahnya.
+
+   Metode yang dipakai untuk membuka formulir dari kartu aksi di halaman utama adalah **`Navigator.push()`**, sebab halaman utama harus tetap ada di stack supaya pengguna bisa kembali ke sana setelah selesai mengisi atau membatalkan formulir.
+
+   Opsi Home di drawer memakai **`Navigator.pushReplacement()`** menuju `MyHomePage`. Alasannya, opsi Home bisa dipanggil dari halaman mana pun lewat drawer yang sama, jadi kalau dipakai `push()` biasa, stack bisa menumpuk banyak salinan halaman utama kalau pengguna bolak-balik. Dengan `pushReplacement()`, halaman aktif (apa pun itu) langsung diganti oleh satu `MyHomePage`, sehingga stack tetap bersih.
+
+2. `Scaffold` menyediakan kerangka visual yang sama di setiap halaman (posisi `AppBar` di atas, `body` di tengah, `drawer` yang bisa dibuka dari sisi kiri), sehingga pengguna tidak perlu mempelajari ulang tata letak setiap kali berpindah halaman. Karena `AppBar` dan `Drawer` dipasang lewat parameter `Scaffold` yang sama persis di halaman utama, formulir Project, dan formulir Experience, perilaku navigasinya pun otomatis konsisten di ketiga halaman tersebut.
+
+   Contoh pemakaian warna tema di lebih dari satu halaman: `BaseColors.primary` dipakai sebagai warna latar `AppBar` di halaman utama (lewat `colorScheme.primary` yang memang di-seed dari warna yang sama), formulir Project, dan formulir Experience, serta sebagai warna latar `DrawerHeader` pada `LeftDrawer` yang dipakai bersama oleh ketiga halaman itu.
+
+3. Formulir disusun sebagai satu `Column` vertikal berisi input yang dibungkus `Form` dan `SingleChildScrollView`, karena urutan pengisiannya memang linear dari atas ke bawah (judul, deskripsi, kategori, tautan, tanggal) sehingga lebih wajar dibaca dan diisi satu per satu ketimbang disusun berdampingan.
+
+   Widget pengatur jarak seperti `Padding` pada tiap input dan `SizedBox` di antara elemen menjaga supaya antar-input tidak saling menempel dan tetap nyaman dibaca. Widget penggulir (`SingleChildScrollView`) berperan penting ketika ruang layar terbatas, misalnya saat papan ketik muncul dan menutup sebagian besar tinggi layar. Tanpa widget ini, input atau tombol Simpan di bagian bawah formulir bisa terpotong atau memicu error overflow karena kontennya lebih tinggi dari layar yang tersedia. Dengan `SingleChildScrollView`, seluruh isi formulir tetap bisa dijangkau dengan cara digulir, berapa pun ukuran layarnya atau apakah papan ketik sedang tampil atau tidak.
+
+4. - **`GlobalKey<FormState>`**: identitas unik yang menghubungkan tombol Simpan dengan widget `Form` tertentu, supaya kode di luar `Form` (seperti `onPressed` pada tombol) bisa mengakses `FormState` miliknya dan memanggil method seperti `validate()` atau `reset()`.
+   - **`validator`**: fungsi yang didaftarkan pada tiap `TextFormField` untuk memeriksa apakah nilai yang diisi memenuhi aturan tertentu. Fungsi ini mengembalikan `null` kalau nilainya valid, atau sebuah `String` pesan kesalahan kalau tidak valid.
+   - **`validate()`**: method pada `FormState` yang menjalankan seluruh `validator` dari semua `TextFormField` di dalam `Form` tersebut sekaligus. Hasilnya `true` kalau semua input valid, `false` kalau ada satu saja yang tidak valid, dan pesan kesalahan dari `validator` yang gagal otomatis muncul di bawah kolom terkait.
+
+   Jadi saat tombol Simpan ditekan, `_formKey.currentState!.validate()` dipanggil lebih dulu. Kalau hasilnya `true`, baru `showDialog()` dijalankan untuk menampilkan ringkasan. Kalau `false`, dialog tidak muncul dan pengguna langsung melihat pesan kesalahan pada kolom yang bermasalah.
+
+   Contoh nilai yang ditolak: pada formulir Experience, kolom Judul Pengalaman menolak nilai kosong atau yang hanya berisi spasi (misalnya `"   "`) karena `validator`-nya memeriksa `value.trim().isEmpty`. Kolom Tautan Thumbnail juga menolak nilai seperti `"bukan-url"` karena tidak diawali `http://` atau `https://`.
+
+   Memilih jenis input atau papan ketik saja (misalnya mengatur `keyboardType` ke `TextInputType.url`) belum cukup, sebab jenis papan ketik hanya memengaruhi tombol apa yang ditampilkan pada papan ketik virtual, bukan memvalidasi isinya. Pengguna tetap bisa mengetik apa saja walaupun papan ketiknya diatur untuk URL, termasuk membiarkannya kosong, mengisi spasi, atau mengetik teks dengan format yang salah. Validasi lewat `validator` tetap dibutuhkan untuk benar-benar memeriksa isi akhirnya sebelum data dianggap sah.
+
+#### AI Disclosure: Tugas 8
+
+##### Tools yang Digunakan
+
+- Claude Code: digunakan untuk widget testing, dan bug fixing.
+  > Catatan: Log penggunaan Claude Code disediakan di folder `logs/`
+
+##### Bagian Spesifik yang Dibantu AI
+
+1. Penyesuaian formulir Experience (field, validasi, dialog ringkasan) berdasarkan model Experience di Django
+2. Widget testing untuk navigasi dan validasi formulir
+
+##### Strategi Prompting
+
+- Menjalankan Claude Code dalam manual approval mode (bukan auto-accept), sehingga setiap perubahan/edit yang diajukan AI harus ditinjau dan disetujui secara eksplisit satu per satu.
+- Semua kode hasil AI ditinjau dan diuji (`flutter analyze` serta `flutter test`) sebelum di-commit.

@@ -1,0 +1,478 @@
+Berdasarkan perbaruan kita, bisakah kamu buatkan widget testing hmmm
+Bash Check git status and diff stats
+IN
+cd "c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile" && git status && git diff --stat
+
+OUT
+On branch feat/experiences
+Your branch is up to date with 'origin/feat/experiences'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   README.md
+	modified:   lib/core/widgets/left_drawer.dart
+	modified:   lib/features/home/pages/home_page.dart
+Bash Find existing test files
+IN
+cd "c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile" && find . -path ./build -prune -o -name "*.dart" -print | grep -i test
+
+OUT
+./test/widget_test.dart
+Bash List all Dart files in lib
+IN
+cd "c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile" && find lib -name "*.dart" | sort
+
+OUT
+lib/app.dart
+lib/core/themes/app_theme.dart
+lib/core/themes/base_colors.dart
+lib/core/themes/font_theme.dart
+lib/core/widgets/left_drawer.dart
+lib/features/experiences/pages/experience_form.dart
+lib/features/home/pages/home_page.dart
+lib/features/home/widgets/info_card.dart
+lib/features/projects/pages/project_form.dart
+lib/main.dart
+Read c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\lib\features\experiences\pages\experience_form.dart
+Read c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\lib\core\widgets\left_drawer.dart
+Read c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\lib\features\home\pages\home_page.dart
+Read c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\test\widget_test.dart
+Read c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\lib\features\projects\pages\project_form.dart
+Bash Check pubspec.yaml package name and dev dependencies
+IN
+cd "c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile" && sed -n '1,20p' pubspec.yaml 2>/dev/null || type pubspec.yaml | head -20
+
+OUT
+name: portfolio_mobile
+description: "A simple portfolio app for the Platform-Based Programming course."
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+10:20 PM
+Confirmed package name is portfolio_mobile with only flutter_test available. I'll add widget tests covering the new experience form and its drawer/navigation wiring.
+
+
+
+Write c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\test\experience_form_test.dart
+175 lines
+// Widget tests for ExperienceFormPage: field rendering, validation,
+// the optional "ended at" date picker, and the success dialog flow.
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:portfolio_mobile/features/experiences/pages/experience_form.dart';
+
+void main() {
+  Future<void> pumpForm(WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(home: ExperienceFormPage()));
+  }
+
+  group('ExperienceFormPage', () {
+    testWidgets('renders all fields with the default category selected', (
+      WidgetTester tester,
+    ) async {
+      await pumpForm(tester);
+
+      expect(find.text('Add Experience Form'), findsOneWidget);
+      expect(find.text('Judul Pengalaman'), findsOneWidget);
+      expect(find.text('Deskripsi Pengalaman'), findsOneWidget);
+      expect(find.text('Kategori Pengalaman'), findsOneWidget);
+      expect(find.text('Tautan Thumbnail'), findsOneWidget);
+      expect(find.text('Full-Time'), findsOneWidget);
+      expect(find.text('Masih berlangsung'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Save'), findsOneWidget);
+    });
+
+    testWidgets('shows validation errors when required fields are empty', (
+      WidgetTester tester,
+    ) async {
+      await pumpForm(tester);
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pump();
+
+      expect(
+        find.text('Judul pengalaman tidak boleh kosong!'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Deskripsi pengalaman tidak boleh kosong!'),
+        findsOneWidget,
+      );
+      // No success dialog should appear.
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+
+    testWidgets('rejects an invalid thumbnail URL', (
+      WidgetTester tester,
+    ) async {
+      await pumpForm(tester);
+
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Judul Pengalaman'),
+        'Software Engineer Intern',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Deskripsi Pengalaman'),
+        'Worked on the mobile app.',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Tautan Thumbnail'),
+        'not-a-valid-url',
+      );
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pump();
+
+      expect(
+        find.text('Tautan thumbnail harus berupa URL yang valid!'),
+        findsOneWidget,
+      );
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+
+    testWidgets(
+      'submits successfully and shows a summary dialog, then resets the form',
+      (WidgetTester tester) async {
+        await pumpForm(tester);
+
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Judul Pengalaman'),
+          'Software Engineer Intern',
+        );
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Deskripsi Pengalaman'),
+          'Worked on the mobile app.',
+        );
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Tautan Thumbnail'),
+          'https://example.com/thumbnail.png',
+        );
+
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+        await tester.pump();
+
+        expect(find.text('Pengalaman berhasil ditambahkan!'), findsOneWidget);
+        expect(
+          find.text('Judul: Software Engineer Intern'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Deskripsi: Worked on the mobile app.'),
+          findsOneWidget,
+        );
+        expect(find.text('Kategori: Full-Time'), findsOneWidget);
+        expect(
+          find.text('Thumbnail: https://example.com/thumbnail.png'),
+          findsOneWidget,
+        );
+        expect(find.text('Status: Masih berlangsung'), findsOneWidget);
+
+        await tester.tap(find.widgetWithText(TextButton, 'OK'));
+        await tester.pump();
+
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(
+          find.widgetWithText(TextFormField, 'Judul Pengalaman'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets('allows an empty thumbnail since it is optional', (
+      WidgetTester tester,
+    ) async {
+      await pumpForm(tester);
+
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Judul Pengalaman'),
+        'Research Assistant',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Deskripsi Pengalaman'),
+        'Helped with data analysis.',
+      );
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pump();
+
+      expect(find.text('Pengalaman berhasil ditambahkan!'), findsOneWidget);
+      expect(find.text('Thumbnail: -'), findsOneWidget);
+    });
+
+    testWidgets('picking an ended-at date shows it and allows clearing it', (
+      WidgetTester tester,
+    ) async {
+      await pumpForm(tester);
+
+      await tester.tap(find.text('Masih berlangsung'));
+      await tester.pumpAndSettle();
+
+      // The Material date picker dialog should now be open.
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      // A date has been picked, so "Masih berlangsung" text is gone
+      // and a clear icon button is shown instead of the calendar icon.
+      expect(find.text('Masih berlangsung'), findsNothing);
+      expect(find.byIcon(Icons.clear), findsOneWidget);
+      expect(find.byIcon(Icons.calendar_today), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pump();
+
+      expect(find.text('Masih berlangsung'), findsOneWidget);
+      expect(find.byIcon(Icons.calendar_today), findsOneWidget);
+    });
+  });
+}
+10:20 PM
+Now let's add tests for the drawer wiring/navigation, since that's part of this branch's update too.
+
+
+
+Write c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\test\left_drawer_test.dart
+72 lines
+// Widget tests for LeftDrawer: menu items are present and each one
+// navigates to the right page (Home, Add Project, Add Experience).
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:portfolio_mobile/core/widgets/left_drawer.dart';
+import 'package:portfolio_mobile/features/experiences/pages/experience_form.dart';
+import 'package:portfolio_mobile/features/home/pages/home_page.dart';
+import 'package:portfolio_mobile/features/projects/pages/project_form.dart';
+
+void main() {
+  Future<void> openDrawer(WidgetTester tester) async {
+    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.pumpAndSettle();
+  }
+
+  group('LeftDrawer', () {
+    testWidgets('shows the header and all menu items', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(MaterialApp(home: MyHomePage()));
+
+      await openDrawer(tester);
+
+      expect(find.text('My Portfolio'), findsOneWidget);
+      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Add Project'), findsOneWidget);
+      expect(find.text('Add Experience'), findsOneWidget);
+    });
+
+    testWidgets('tapping "Add Experience" navigates to ExperienceFormPage', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(MaterialApp(home: MyHomePage()));
+
+      await openDrawer(tester);
+      await tester.tap(find.text('Add Experience'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ExperienceFormPage), findsOneWidget);
+      expect(find.text('Add Experience Form'), findsOneWidget);
+    });
+
+    testWidgets('tapping "Add Project" navigates to ProjectFormPage', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(MaterialApp(home: MyHomePage()));
+
+      await openDrawer(tester);
+      await tester.tap(find.text('Add Project'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ProjectFormPage), findsOneWidget);
+      expect(find.text('Add Project Form'), findsOneWidget);
+    });
+
+    testWidgets('tapping "Home" from the experience form returns to MyHomePage', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(MaterialApp(home: const ExperienceFormPage()));
+
+      await openDrawer(tester);
+      await tester.tap(find.text('Home'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MyHomePage), findsOneWidget);
+      expect(find.byType(ExperienceFormPage), findsNothing);
+    });
+  });
+}
+10:20 PM
+Fixing the unused import flagged by the diagnostics.
+
+
+
+Edit c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\test\left_drawer_test.dart
+Removed 1 line
+10:20 PM
+Now let's run the tests to make sure they actually pass.
+
+
+
+Bash Run flutter widget tests
+IN
+cd "c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile" && flutter test 2>&1 | tail -150
+
+OUT
+00:00 +0: loading C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart
+00:00 +0: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage renders all fields with the default category selected
+00:00 +1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage renders all fields with the default category selected
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 2 widgets with text "Judul Pengalaman": [
+            Text("Judul Pengalaman", textAlign: start, overflow: ellipsis, dependencies:
+[DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+            Text("Judul Pengalaman", debugLabel: ((englishLike bodyLarge
+2021).merge((blackMountainView bodyLarge).apply)).merge(unknown), inherit: false, color:
+Color(alpha: 1.0000, red: 0.2863, green: 0.2706, blue: 0.3098, colorSpace: ColorSpace.sRGB), family:
+Roboto, size: 16.0, weight: 400, letterSpacing: 0.5, baseline: alphabetic, height: 1.5x,
+leadingDistribution: even, decoration: Color(alpha: 1.0000, red: 0.1137, green: 0.1059, blue:
+0.1255, colorSpace: ColorSpace.sRGB) TextDecoration.none, textAlign: start, overflow: ellipsis,
+maxLines: 1, dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+          ]>
+   Which: is too many
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart:21:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart line 21
+The test description was:
+  renders all fields with the default category selected
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:00 +1 -1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/widget_test.dart: Home page shows profile info and menu actions
+00:00 +1 -1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage renders all fields with the default category selected [E]
+  Test failed. See exception logs above.
+  The test description was: renders all fields with the default category selected
+  
+00:00 +2 -1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/left_drawer_test.dart: LeftDrawer tapping "Add Experience" navigates to ExperienceFormPage
+00:01 +3 -1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/left_drawer_test.dart: LeftDrawer tapping "Add Experience" navigates to ExperienceFormPage
+00:01 +4 -1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage rejects an invalid thumbnail URL
+00:01 +5 -1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage rejects an invalid thumbnail URL
+00:01 +6 -1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/left_drawer_test.dart: LeftDrawer tapping "Home" from the experience form returns to MyHomePage
+00:01 +7 -1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage submits successfully and shows a summary dialog, then resets the form
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _AncestorWidgetFinder:<Found 2 widgets with type "TextFormField" that are ancestors of
+widgets with text "Judul Pengalaman": [
+            TextFormField(dependencies: [InheritedCupertinoTheme, UnmanagedRestorationScope,
+_FormScope, _InheritedTheme, _LocalizationsScope-[GlobalKey#242d5]], state:
+_TextFormFieldState#33b3d),
+            TextFormField(dependencies: [InheritedCupertinoTheme, UnmanagedRestorationScope,
+_FormScope, _InheritedTheme, _LocalizationsScope-[GlobalKey#242d5]], state:
+_TextFormFieldState#33b3d),
+          ]>
+   Which: is too many
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart:119:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart line 119
+The test description was:
+  submits successfully and shows a summary dialog, then resets the form
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +7 -2: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage submits successfully and shows a summary dialog, then resets the form [E]
+  Test failed. See exception logs above.
+  The test description was: submits successfully and shows a summary dialog, then resets the form
+  
+00:01 +7 -2: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage allows an empty thumbnail since it is optional
+00:01 +8 -2: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage picking an ended-at date shows it and allows clearing it
+00:02 +9 -2: Some tests failed.
+
+Failing tests:
+  C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage renders all fields with the default category selected
+  C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage submits successfully and shows a summary dialog, then resets the form
+Read c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\test\experience_form_test.dart
+Edit c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile\test\experience_form_test.dart
+Added 2 lines
+10:21 PM
+Now fix the .first issue for all enterText/widgetWithText(TextFormField, 'Judul Pengalaman'/'Deskripsi Pengalaman') interactions.
+
+
+
+Bash Append .first to ambiguous TextFormField finders for duplicate label/hint fields
+IN
+cd "c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile" && python3 - <<'EOF'
+import re
+path = "test/experience_form_test.dart"
+with open(path, encoding="utf-8") as f:
+    content = f.read()
+
+for label in ["Judul Pengalaman", "Deskripsi Pengalaman"]:
+    old = f"find.widgetWithText(TextFormField, '{label}')"
+    new = f"find.widgetWithText(TextFormField, '{label}').first"
+    content = content.replace(old, new)
+
+with open(path, "w", encoding="utf-8") as f:
+    f.write(content)
+print("done")
+EOF
+
+OUT
+done
+Bash Re-run flutter widget tests after fixes
+IN
+cd "c:\Users\mzida_yqzansz\Projects\academic\pbp\portfolio_mobile" && flutter test 2>&1 | tail -150
+
+OUT
+00:00 +0: loading C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart
+00:00 +0: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage renders all fields with the default category selected
+00:00 +1: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/left_drawer_test.dart: LeftDrawer shows the header and all menu items
+00:00 +2: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/widget_test.dart: Home page shows profile info and menu actions
+00:00 +3: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/widget_test.dart: Home page shows profile info and menu actions
+00:00 +4: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/left_drawer_test.dart: LeftDrawer tapping "Add Experience" navigates to ExperienceFormPage
+00:01 +5: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/left_drawer_test.dart: LeftDrawer tapping "Add Experience" navigates to ExperienceFormPage
+00:01 +6: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage submits successfully and shows a summary dialog, then resets the form
+00:01 +7: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage submits successfully and shows a summary dialog, then resets the form
+00:01 +8: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/left_drawer_test.dart: LeftDrawer tapping "Home" from the experience form returns to MyHomePage
+00:01 +9: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage allows an empty thumbnail since it is optional
+00:01 +10: C:/Users/mzida_yqzansz/Projects/academic/pbp/portfolio_mobile/test/experience_form_test.dart: ExperienceFormPage picking an ended-at date shows it and allows clearing it
+00:01 +11: All tests passed!
+10:21 PM
+All 11 tests pass. I've added two widget test files covering the recent experience-form feature and the drawer wiring:
+
+test/experience_form_test.dart — field rendering, empty-field validation, invalid thumbnail URL rejection, successful submission + summary dialog + form reset, optional thumbnail, and the "ended at" date picker (pick + clear).
+test/left_drawer_test.dart — drawer menu items render, and each (Home, Add Project, Add Experience) navigates to the right page.
+flutter test runs clean (11/11) including the pre-existing widget_test.dart.
