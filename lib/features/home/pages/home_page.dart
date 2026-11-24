@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio_mobile/core/services/auth_state.dart';
 import 'package:portfolio_mobile/core/themes/base_colors.dart';
 import 'package:portfolio_mobile/core/themes/font_theme.dart';
+import 'package:portfolio_mobile/core/widgets/auth_guard.dart';
+import 'package:portfolio_mobile/features/auth/pages/login_page.dart';
 import 'package:portfolio_mobile/features/home/widgets/info_card.dart';
 import 'package:portfolio_mobile/core/widgets/left_drawer.dart';
 import 'package:portfolio_mobile/features/experiences/pages/experience_form.dart';
 import 'package:portfolio_mobile/features/projects/pages/project_form.dart';
+import 'package:portfolio_mobile/features/projects/pages/project_list_page.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
@@ -13,20 +18,23 @@ class MyHomePage extends StatelessWidget {
   final String nama = "Mohammad Zidane Kurnianto";
   final String kelas = "PBP F";
 
-  final List<ItemHomepage> items = [
-    ItemHomepage('Lihat Proyek', Icons.folder_rounded, BaseColors.primary500),
-    ItemHomepage(
-      'Tambah Proyek',
-      Icons.add_circle_rounded,
-      BaseColors.secondary500,
-    ),
-    ItemHomepage('Tambah Pengalaman', Icons.work_rounded, BaseColors.warning),
-    ItemHomepage('Logout', Icons.logout_rounded, BaseColors.error),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isLoggedIn = context.watch<AuthState>().isLoggedIn;
+
+    final items = <ItemHomepage>[
+      ItemHomepage('Lihat Proyek', Icons.folder_rounded, BaseColors.primary500),
+      ItemHomepage(
+        'Tambah Proyek',
+        Icons.add_circle_rounded,
+        BaseColors.secondary500,
+      ),
+      ItemHomepage('Tambah Pengalaman', Icons.work_rounded, BaseColors.warning),
+      isLoggedIn
+          ? ItemHomepage('Logout', Icons.logout_rounded, BaseColors.error)
+          : ItemHomepage('Login', Icons.login_rounded, BaseColors.error),
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -174,7 +182,25 @@ class ItemCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(18.0),
       child: InkWell(
         borderRadius: BorderRadius.circular(18.0),
-        onTap: () {
+        onTap: () async {
+          if (item.name == "Logout") {
+            await context.read<AuthState>().logout();
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(content: Text("Kamu telah logout.")),
+              );
+            return;
+          }
+          if (item.name == "Login") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+            );
+            return;
+          }
+
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
@@ -188,7 +214,14 @@ class ItemCard extends StatelessWidget {
               ),
             );
           // Navigate ke halaman yang sesuai
-          if (item.name == "Tambah Proyek") {
+          if (item.name == "Lihat Proyek") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProjectListPage()),
+            );
+          } else if (item.name == "Tambah Proyek") {
+            final loggedIn = await ensureLoggedIn(context);
+            if (!context.mounted || !loggedIn) return;
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProjectFormPage()),

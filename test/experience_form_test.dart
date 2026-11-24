@@ -6,9 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:portfolio_mobile/features/experiences/pages/experience_form.dart';
 
+import 'test_helpers.dart';
+
 void main() {
   Future<void> pumpForm(WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: ExperienceFormPage()));
+    await tester.pumpWidget(wrapWithProviders(const ExperienceFormPage()));
   }
 
   group('ExperienceFormPage', () {
@@ -37,10 +39,7 @@ void main() {
       await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
       await tester.pump();
 
-      expect(
-        find.text('Judul pengalaman tidak boleh kosong!'),
-        findsOneWidget,
-      );
+      expect(find.text('Judul pengalaman tidak boleh kosong!'), findsOneWidget);
       expect(
         find.text('Deskripsi pengalaman tidak boleh kosong!'),
         findsOneWidget,
@@ -99,10 +98,7 @@ void main() {
         await tester.pump();
 
         expect(find.text('Pengalaman berhasil ditambahkan!'), findsOneWidget);
-        expect(
-          find.text('Judul: Software Engineer Intern'),
-          findsOneWidget,
-        );
+        expect(find.text('Judul: Software Engineer Intern'), findsOneWidget);
         expect(
           find.text('Deskripsi: Worked on the mobile app.'),
           findsOneWidget,

@@ -7,27 +7,31 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:portfolio_mobile/app.dart';
+import 'package:portfolio_mobile/features/auth/pages/login_page.dart';
+import 'package:portfolio_mobile/features/home/pages/home_page.dart';
+
+import 'test_helpers.dart';
 
 void main() {
   testWidgets('Home page shows profile info and menu actions', (
     WidgetTester tester,
   ) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const App());
+    // Build the home page with its provider dependencies and trigger a frame.
+    await tester.pumpWidget(wrapWithProviders(MyHomePage()));
 
     // Verify the profile info and menu actions are shown.
     expect(find.text('MyPortfolio'), findsOneWidget);
     expect(find.text('Lihat Proyek'), findsOneWidget);
     expect(find.text('Tambah Proyek'), findsOneWidget);
-    expect(find.text('Logout'), findsOneWidget);
+    // Not logged in by default, so the tile reads "Login".
+    expect(find.text('Login'), findsOneWidget);
 
-    // Tap a menu action and verify the SnackBar message appears.
-    await tester.ensureVisible(find.text('Logout'));
+    // Tap the login menu action and verify it navigates to LoginPage.
+    await tester.ensureVisible(find.text('Login'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Logout'));
-    await tester.pump();
+    await tester.tap(find.text('Login'));
+    await tester.pumpAndSettle();
 
-    expect(find.text('Kamu telah menekan tombol Logout!'), findsOneWidget);
+    expect(find.byType(LoginPage), findsOneWidget);
   });
 }
