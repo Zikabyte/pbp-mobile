@@ -12,7 +12,7 @@ import 'package:portfolio_mobile/features/projects/pages/project_list_page.dart'
 import 'package:provider/provider.dart';
 
 class MyHomePage extends StatelessWidget {
-  MyHomePage({super.key});
+  const MyHomePage({super.key});
 
   final String npm = "2506584861";
   final String nama = "Mohammad Zidane Kurnianto";
